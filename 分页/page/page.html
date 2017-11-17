@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html ng-app="myApp">
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="../angular/angular.js"></script>
+        <script type="text/javascript" src="../angular/angular-ui-router.min.js"></script>
+    </head>
+    <body ng-controller="myCon">
+        <table border="1">
+            <tr>
+                <td>id</td>
+                <td>用户名</td>
+            </tr>
+            <tr ng-repeat="v in data|limitTo:num:start">
+                <td>{{v.id}}</td>
+                <td>{{v.name}}</td>
+            </tr>
+        </table>
+       
+        <a ng-show="last" ng-click="getPage(page-1);">上一页</a>
+        <a ng-repeat="v in pageArr" ng-click="getPage(v);">{{v}}</a>
+        <a ng-show="next" ng-click="getPage(page+1);">下一页</a>
+    </body>
+</html>
+<script>
+    var app = angular.module("myApp", ["ui.router"]);
+    
+    app.controller("myCon",["$scope",function($scope){
+        //示例数据
+        $scope.data = [
+            {"id":1,"name":"张三"},
+            {"id":2,"name":"张三1"},
+            {"id":3,"name":"张三2"},
+            {"id":4,"name":"张三3"},
+            {"id":5,"name":"张三4"},
+            {"id":6,"name":"张三6"},
+            {"id":7,"name":"张三5"},
+            {"id":8,"name":"张三7"},
+            {"id":9,"name":"张三9"},
+        ];
+        //每页显示的条数
+        $scope.num = 1;
+        //开始的位置
+        $scope.start = 0;
+        //当前页数
+        $scope.page = 1;
+        //是否显示上一页
+        $scope.last = false;
+        //是否显示下一页
+        $scope.next = false;
+        //获取总页面
+        $scope.countPage = Math.ceil($scope.data.length / $scope.num);
+        
+        //分页的函数，num为传入当前页数
+        $scope.getPage = function(num){
+            //改变当前页数
+            $scope.page = num;
+            //改变分页起始位置
+            $scope.start = (num-1)*$scope.num;
+            
+            //判断分页的开始值和结束值
+            if($scope.countPage > 5){
+                var start = num-2;
+                var end = num+2;
+                if(start < 1){
+                    start = 1;
+                    end = 5;
+                }
+                if(end > $scope.countPage){
+                    end = $scope.countPage;
+                    start = $scope.countPage-4;
+                }
+            }else{
+                var start = 1;
+                var end = $scope.countPage;
+            }
+            //组装页数的函数
+            $scope.pageArr = new Array();
+            for(i=start;i<=end;i++){
+                $scope.pageArr.push(i);
+            }
+            //上一页，下一页的显示
+            $scope.last = true;
+            $scope.next = true;
+            if($scope.page == 1){
+                $scope.last = false;
+            }
+            if($scope.page == $scope.countPage){
+                $scope.next = false;
+            }
+        }
+        //第一次访问调用第一页
+        $scope.getPage(1);
+    }]);
+</script>
